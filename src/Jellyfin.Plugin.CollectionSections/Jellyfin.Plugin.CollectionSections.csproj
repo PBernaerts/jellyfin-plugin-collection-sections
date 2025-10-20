@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <JellyfinVersion>10.10.7</JellyfinVersion>
+        <JellyfinVersion>10.11.0</JellyfinVersion>
         <TargetFramework Condition="$(JellyfinVersion.StartsWith('10.11.0'))">net9.0</TargetFramework>
         <TargetFramework Condition="'$(JellyfinVersion)' == '10.10.7'">net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <AssemblyName>Jellyfin.Plugin.CollectionSections</AssemblyName>
-        <Version>2.2.2.0</Version>
+        <Version>2.3.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,19 +30,13 @@
     </ItemGroup>
 
     <!-- Remove 10.11.0 Specific Code from non 10.11.0 builds -->
-    <ItemGroup Condition="'$(JellyfinVersion)' != '10.11.0-rc8'">
-        <None Include="JellyfinVersionSpecific/10.11.0-rc8/*.cs" />
-        <Compile Remove="JellyfinVersionSpecific/10.11.0-rc8/*.cs" />
-    </ItemGroup>
-
-    <!-- Remove 10.11.0 Specific Code from non 10.11.0 builds -->
     <ItemGroup Condition="'$(JellyfinVersion)' != '10.11.0'">
         <None Include="JellyfinVersionSpecific/10.11.0/*.cs" />
         <Compile Remove="JellyfinVersionSpecific/10.11.0/*.cs" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('C:\ProgramData\Jellyfin\Server\plugins\CollectionSections')">
-        <Exec Condition="'$(JellyfinVersion)' == '10.11.0-rc8'" Command="xcopy $(TargetDir) &quot;C:\ProgramData\Jellyfin\Server\plugins\CollectionSections&quot; /y" />
+        <Exec Condition="'$(JellyfinVersion)' == '10.11.0'" Command="xcopy $(TargetDir) &quot;C:\ProgramData\Jellyfin\Server\plugins\CollectionSections&quot; /y" />
         <Exec Condition="'$(JellyfinVersion)' == '10.10.7'"     Command="xcopy $(TargetDir) &quot;C:\ProgramData\Jellyfin\Server_10_10_7\plugins\CollectionSections&quot; /y" />
     </Target>
 </Project>

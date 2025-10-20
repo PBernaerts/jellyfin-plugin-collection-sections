@@ -5,5 +5,5 @@ using Jellyfin.Plugin.CollectionSections.Attributes;
 [assembly: AssemblyProduct("Jellyfin.Plugin.CollectionSections")]
 [assembly: AssemblyDescription("Adds ability to add home screen sections for collections and playlists to Jellyfin.")]
 [assembly: AssemblyTitle("Jellyfin.Plugin.CollectionSections")]
-[assembly: AssemblyVersion("2.2.2.0")]
-[assembly: JellyfinVersion("10.10.7")]
+[assembly: AssemblyVersion("2.3.0.0")]
+[assembly: JellyfinVersion("10.11.0")]

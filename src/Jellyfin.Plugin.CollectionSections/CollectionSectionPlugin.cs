@@ -154,6 +154,11 @@ namespace Jellyfin.Plugin.CollectionSections
             }
         }
 
+        public override void OnUninstalling()
+        {
+            base.OnUninstalling();
+        }
+
         public IEnumerable<PluginPageInfo> GetPages()
         {
             string? prefix = GetType().Namespace;
