@@ -35,3 +35,9 @@ When coupled with an automatic collection plugin this can create very dynamic se
 2. Install the prerequisite plugins by following the Home Screen Sections install guide.
 3. Install `Collection Sections` from the Catalogue.
 4. Restart Jellyfin.
+
+### FAQ
+
+#### I've updated Jellyfin to latest version but I can't see the plugin available in the catalogue
+
+The likelihood is the plugin hasn't been updated for that version of Jellyfin and the plugins are strictly 1 version compatible. Please wait until an update has been pushed. If you can see the version number in the release assets then please make an issue, but if its not in the assets, please wait. I know Jellyfin has updated, I'll update when I can.
