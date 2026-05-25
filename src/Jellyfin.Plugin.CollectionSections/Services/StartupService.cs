@@ -43,7 +43,7 @@ namespace Jellyfin.Plugin.CollectionSections.Services
             ICollectionManager collectionManager = m_serviceProvider.GetRequiredService<ICollectionManager>();
             IPlaylistManager playlistManager = m_serviceProvider.GetRequiredService<IPlaylistManager>();
 
-            foreach (User user in userManager.Users)
+            foreach (User user in userManager.GetAllUsers())
             {
                 logger.LogInformation($"Caching data for user {user.Username}");
                 if (!LibraryCache.CachedCollections.ContainsKey(user.Id))
