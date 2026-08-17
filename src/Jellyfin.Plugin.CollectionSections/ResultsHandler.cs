@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Jellyfin.Data.Enums;
 using Jellyfin.Plugin.CollectionSections.Extensions;
 using Jellyfin.Plugin.CollectionSections.Model;
 using MediaBrowser.Controller.Collections;
@@ -62,14 +63,22 @@ namespace Jellyfin.Plugin.CollectionSections
             User user = m_userManager.GetUserById(payload.UserId)!;
             m_logger.LogInformation($"{payload.AdditionalData} - User: {timer.ElapsedMilliseconds}ms");
             
-            // Looked up on every request rather than from a startup cache. The cache
-            // held BoxSet entities for the lifetime of the server, so a collection
-            // edited by anything else (an external collection manager, the web UI)
-            // kept serving the membership and DisplayOrder it had at startup.
-            BoxSet? collection = m_collectionManager.GetCollections(user)
-                .FirstOrDefault(x => x.Name == payload.AdditionalData);
+            // Asked of the library manager on every request, rather than kept in a
+            // startup cache or walked down from the collections folder. Both of those
+            // hand back BoxSet instances that were materialised once and then hold
+            // their own children list, so a collection edited afterwards by anything
+            // else, an external collection manager or the web UI, kept serving the
+            // membership and DisplayOrder it had when the server started. Querying by
+            // id returns the instance the collection manager actually updates, which
+            // is why the same lookup through /Items?ParentId= was always current.
+            BoxSet? collection = m_libraryManager.GetItemList(new InternalItemsQuery(user)
+            {
+                IncludeItemTypes = new[] { BaseItemKind.BoxSet },
+                Name = payload.AdditionalData,
+                Recursive = true
+            }).OfType<BoxSet>().FirstOrDefault();
             m_logger.LogInformation($"{payload.AdditionalData} - Collection: {timer.ElapsedMilliseconds}ms");
-        
+
             List<BaseItem> items =  collection?.GetChildren(user, true, null).ToList() ?? new List<BaseItem>();
             
             m_logger.LogInformation($"{payload.AdditionalData} - Children: {timer.ElapsedMilliseconds}ms");
