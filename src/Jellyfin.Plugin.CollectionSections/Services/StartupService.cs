@@ -38,28 +38,7 @@ namespace Jellyfin.Plugin.CollectionSections.Services
         {
             ILogger logger = m_serviceProvider.GetRequiredService<ILogger<StartupService>>();
             
-            logger.LogInformation("CollectionSections Startup. Starting cache process for playlists and collections for quicker data retrievable on request.");
-            IUserManager userManager = m_serviceProvider.GetRequiredService<IUserManager>();
-            ICollectionManager collectionManager = m_serviceProvider.GetRequiredService<ICollectionManager>();
-            IPlaylistManager playlistManager = m_serviceProvider.GetRequiredService<IPlaylistManager>();
-
-            foreach (User user in userManager.GetAllUsers())
-            {
-                logger.LogInformation($"Caching data for user {user.Username}");
-                if (!LibraryCache.CachedCollections.ContainsKey(user.Id))
-                {
-                    LibraryCache.CachedCollections.Add(user.Id, new List<BoxSet>(collectionManager.GetCollections(user)));
-                }
-
-                if (!LibraryCache.CachedPlaylists.ContainsKey(user.Id))
-                {
-                    LibraryCache.CachedPlaylists.Add(user.Id, new List<Playlist>(playlistManager.GetPlaylists(user.Id)));
-                }
-                
-                logger.LogInformation($"Caching data for user {user.Username} finished");
-            }
-            
-            logger.LogInformation($"Caching finished");
+            logger.LogInformation("CollectionSections Startup. Registering sections.");
             CollectionSectionPlugin.Instance.OnConfigurationChanged(this, CollectionSectionPlugin.Instance.Configuration);
         }
 

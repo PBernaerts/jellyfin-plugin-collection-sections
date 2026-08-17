@@ -62,9 +62,11 @@ namespace Jellyfin.Plugin.CollectionSections
             User user = m_userManager.GetUserById(payload.UserId)!;
             m_logger.LogInformation($"{payload.AdditionalData} - User: {timer.ElapsedMilliseconds}ms");
             
-            LibraryCache.CachedCollections.TryGetValue(user.Id, out List<BoxSet>? collections);
-            
-            BoxSet? collection = collections?.FirstOrDefault(x => x.Name == payload.AdditionalData) ?? m_collectionManager.GetCollections(user)
+            // Looked up on every request rather than from a startup cache. The cache
+            // held BoxSet entities for the lifetime of the server, so a collection
+            // edited by anything else (an external collection manager, the web UI)
+            // kept serving the membership and DisplayOrder it had at startup.
+            BoxSet? collection = m_collectionManager.GetCollections(user)
                 .FirstOrDefault(x => x.Name == payload.AdditionalData);
             m_logger.LogInformation($"{payload.AdditionalData} - Collection: {timer.ElapsedMilliseconds}ms");
         
@@ -104,9 +106,8 @@ namespace Jellyfin.Plugin.CollectionSections
                 ImageTypeLimit = 1
             };
             
-            LibraryCache.CachedPlaylists.TryGetValue(payload.UserId, out List<Playlist>? playlists);
-            
-            Playlist? playlist = playlists?.FirstOrDefault(x => x.Name == payload.AdditionalData) ?? m_playlistManager.GetPlaylists(payload.UserId)
+            // Live lookup, for the same reason as the collection path above.
+            Playlist? playlist = m_playlistManager.GetPlaylists(payload.UserId)
                 .FirstOrDefault(x => x.Name == payload.AdditionalData);
             m_logger.LogInformation($"{payload.AdditionalData} - Playlist: {timer.ElapsedMilliseconds}ms");
 
