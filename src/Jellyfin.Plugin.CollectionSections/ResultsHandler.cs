@@ -71,14 +71,24 @@ namespace Jellyfin.Plugin.CollectionSections
             // membership and DisplayOrder it had when the server started. Querying by
             // id returns the instance the collection manager actually updates, which
             // is why the same lookup through /Items?ParentId= was always current.
-            BoxSet? collection = m_libraryManager.GetItemList(new InternalItemsQuery(user)
+            BoxSet? collection = m_collectionManager.GetCollections(user)
+                .FirstOrDefault(x => x.Name == payload.AdditionalData);
+
+            // Re-resolve by id before reading the children. GetCollections walks the
+            // collections folder, and a Jellyfin Folder materialises its child list
+            // once per instance, so the object it yields is a snapshot from the first
+            // time that folder was read: its membership and DisplayOrder never change
+            // again for the life of the process. Asking the library manager for the
+            // same id returns the instance the collection manager actually updates,
+            // which is why the equivalent /Items?ParentId= request was always current.
+            if (collection is not null && m_libraryManager.GetItemById(collection.Id) is BoxSet current)
             {
-                IncludeItemTypes = new[] { BaseItemKind.BoxSet },
-                Recursive = true
-            }).OfType<BoxSet>().FirstOrDefault(x => x.Name == payload.AdditionalData);
+                collection = current;
+            }
             m_logger.LogInformation($"{payload.AdditionalData} - Collection: {timer.ElapsedMilliseconds}ms");
 
             List<BaseItem> items =  collection?.GetChildren(user, true, null).ToList() ?? new List<BaseItem>();
+            m_logger.LogInformation($"{payload.AdditionalData} - Children: {items.Count} items");
             
             m_logger.LogInformation($"{payload.AdditionalData} - Children: {timer.ElapsedMilliseconds}ms");
             items = items.Take(Math.Min(items.Count, 16)).ToList();
