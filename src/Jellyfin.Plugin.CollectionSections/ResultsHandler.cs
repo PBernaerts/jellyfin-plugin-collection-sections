@@ -74,9 +74,8 @@ namespace Jellyfin.Plugin.CollectionSections
             BoxSet? collection = m_libraryManager.GetItemList(new InternalItemsQuery(user)
             {
                 IncludeItemTypes = new[] { BaseItemKind.BoxSet },
-                Name = payload.AdditionalData,
                 Recursive = true
-            }).OfType<BoxSet>().FirstOrDefault();
+            }).OfType<BoxSet>().FirstOrDefault(x => x.Name == payload.AdditionalData);
             m_logger.LogInformation($"{payload.AdditionalData} - Collection: {timer.ElapsedMilliseconds}ms");
 
             List<BaseItem> items =  collection?.GetChildren(user, true, null).ToList() ?? new List<BaseItem>();
